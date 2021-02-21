@@ -1,3 +1,3 @@
-# GAME3001-W2021-Lab 4
+# GAME3001-W2021-A2
 
-This is a demo project for Lab 4
+This is a demo project for A2
