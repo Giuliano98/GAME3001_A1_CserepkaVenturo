@@ -11,6 +11,10 @@
 PlayScene::PlayScene() : m_moveCounter(0), m_shipIsMoving(false)
 {
 	PlayScene::start();
+	// Set Background music
+	SoundManager::Instance().load("../Assets/audio/BeepBox-Song.wav", "bg_music", SOUND_MUSIC);
+	SoundManager::Instance().playMusic("bg_music", 10, 0);
+	SoundManager::Instance().setMusicVolume(6);
 }
 
 PlayScene::~PlayScene()
@@ -20,10 +24,22 @@ void PlayScene::draw()
 {
 	drawDisplayList();
 	
-	if(EventManager::Instance().isIMGUIActive())
+	if (EventManager::Instance().isKeyUp(SDL_SCANCODE_H))
+	{
+		GUI_Function();
+	}
+		
+		TextureManager::Instance()->draw("asteroid", 420, 220, 0, 255, true);
+		TextureManager::Instance()->draw("asteroid", 620, 180, 0, 255, true);
+		TextureManager::Instance()->draw("asteroid", 620, 260, 0, 255, true);
+		TextureManager::Instance()->draw("asteroid", 380, 180, 0, 255, true);
+		TextureManager::Instance()->draw("asteroid", 500, 260, 0, 255, true);
+		TextureManager::Instance()->draw("asteroid", 540, 220, 0, 255, true);
+
+	/*if(EventManager::Instance().isIMGUIActive())
 	{
 		GUI_Function();	
-	}
+	}*/
 
 	SDL_SetRenderDrawColor(Renderer::Instance()->getRenderer(), 255, 255, 255, 255);
 }
@@ -33,6 +49,8 @@ void PlayScene::update()
 	updateDisplayList();
 	if (m_shipIsMoving)
 		m_moveShip();
+
+	CollisionManager::AABBCheck(m_pShip, m_pTarget);
 }
 
 void PlayScene::clean()
@@ -42,7 +60,9 @@ void PlayScene::clean()
 
 void PlayScene::handleEvents()
 {
+	int x, y;
 	EventManager::Instance().update();
+	SDL_GetMouseState(&x, &y);
 
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_ESCAPE))
 		TheGame::Instance()->quit();
@@ -61,10 +81,17 @@ void PlayScene::handleEvents()
 
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_G))
 		m_setGridEnabled(!m_getGridEnabled());
+
+	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
+	{
+		m_pShip->getTransform()->position.x = x;
+		m_pShip->getTransform()->position.y = y;
+	}
 }
 
 void PlayScene::start()
 {
+
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
 
@@ -76,17 +103,25 @@ void PlayScene::start()
 	
 	// add the ship to the scene
 	m_pShip = new Ship();
-	m_pShip->getTransform()->position = m_getTile(1, 3)->getTransform()->position + offset;
-	m_pShip->setGridPosition(1, 3);
-	m_getTile(1, 3)->setTileStatus(START);
+	m_pShip->getTransform()->position = m_getTile(1, 5)->getTransform()->position + offset;
+	m_pShip->setGridPosition(1, 5);
+	m_getTile(1, 5)->setTileStatus(START);
 	addChild(m_pShip);
 
 	// add the target to the scene
 	m_pTarget = new Target();
-	m_pTarget->getTransform()->position = m_getTile(15, 11)->getTransform()->position + offset;
-	m_pTarget->setGridPosition(15, 11);
-	m_getTile(15, 11)->setTileStatus(GOAL);
+	m_pTarget->getTransform()->position = m_getTile(15, 5)->getTransform()->position + offset;
+	m_pTarget->setGridPosition(15, 5);
+	m_getTile(15, 5)->setTileStatus(GOAL);
 	addChild(m_pTarget);
+
+	// Impassable objects.
+	m_getTile(9, 4)->setTileStatus(IMPASSABLE);
+	m_getTile(12, 6)->setTileStatus(IMPASSABLE);
+	m_getTile(10, 5)->setTileStatus(IMPASSABLE);
+	m_getTile(15, 4)->setTileStatus(IMPASSABLE);
+	m_getTile(15, 6)->setTileStatus(IMPASSABLE);
+	m_getTile(13, 5)->setTileStatus(IMPASSABLE);
 
 	m_computeTileCosts();
 }
@@ -102,7 +137,7 @@ void PlayScene::GUI_Function()
 	// See examples by uncommenting the following - also look at imgui_demo.cpp in the IMGUI filter
 	//ImGui::ShowDemoWindow();
 	
-	ImGui::Begin("GAME3001 - Lab Assignment 1 - Cserepka", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
+	ImGui::Begin("GAME3001 - Lab Assignment 1 - CserepkaVenturo", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
 	static bool isGridEnabled = false;
 	if(ImGui::Checkbox("Grid Enabled", &isGridEnabled))
@@ -179,7 +214,7 @@ void PlayScene::GUI_Function()
 	
 	if (ImGui::Button("Reset"))
 	{
-		
+
 	}
 
 	ImGui::Separator();
@@ -314,9 +349,9 @@ void PlayScene::m_findShortestPath()
 			{
 				if (neighbour != nullptr)
 				{
-					if (neighbour->getTileStatus() != GOAL)
+					if (neighbour->getTileStatus() != GOAL) //  && neighbour->getTileStatus() != IMPASSABLE
 					{
-						if (neighbour->getTileCost() < min)
+						if (neighbour->getTileCost() < min && neighbour->getTileStatus() !=	IMPASSABLE)
 						{
 							min = neighbour->getTileCost();
 							minTile = neighbour;
@@ -408,6 +443,7 @@ void PlayScene::m_moveShip()
 		if (Game::Instance()->getFrames() % 20 == 0)
 		{
 			m_moveCounter++;
+			SoundManager::Instance().playSound("move", 0);
 		}
 	}
 	else

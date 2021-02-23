@@ -34,6 +34,7 @@ private:
 
 	Target* m_pTarget;
 	Ship* m_pShip;
+	Tile* m_pTile;
 
 	// Pathfinding functions and objects
 	void m_buildGrid();

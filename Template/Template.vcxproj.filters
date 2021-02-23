@@ -138,6 +138,9 @@
     <ClCompile Include="..\src\NavigationObject.cpp">
       <Filter>Navigation</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\LogoGBC.cpp">
+      <Filter>Game Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\StartScene.h">
@@ -292,6 +295,9 @@
     </ClInclude>
     <ClInclude Include="..\src\NavigationObject.h">
       <Filter>Navigation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\LogoGBC.h">
+      <Filter>Game Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

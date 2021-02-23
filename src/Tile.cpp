@@ -9,6 +9,9 @@
 
 Tile::Tile()
 {
+	TextureManager::Instance()->load("../Assets/textures/asteroid.png", "asteroid");
+
+	const auto size = TextureManager::Instance()->getTextureSize("asteroid");
 	setWidth(Config::TILE_SIZE);
 	setHeight(Config::TILE_SIZE);
 }

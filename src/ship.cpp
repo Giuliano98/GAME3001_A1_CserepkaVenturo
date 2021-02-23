@@ -3,10 +3,13 @@
 #include "PlayScene.h"
 #include "TextureManager.h"
 #include "Util.h"
+#include "SoundManager.h"
+#include "SoundType.h"
 
 Ship::Ship() : m_maxSpeed(10.0f)
 {
-	TextureManager::Instance()->load("../Assets/textures/ship3.png","ship");
+	SoundManager::Instance().load("../Assets/audio/shipMoveSFX.wav", "move", SOUND_SFX);
+	TextureManager::Instance()->load("../Assets/textures/ship.png","ship");
 
 	auto size = TextureManager::Instance()->getTextureSize("ship");
 	setWidth(size.x);
@@ -103,7 +106,6 @@ float Ship::getMaxSpeed() const
 void Ship::setTargetPosition(glm::vec2 newPosition)
 {
 	m_targetPosition = newPosition;
-
 }
 
 void Ship::setCurrentDirection(glm::vec2 newDirection)
